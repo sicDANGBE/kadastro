@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@theme {
+  /* --- TYPOGRAPHIE --- */
+  --font-display: "Spline Sans", sans-serif;
+  --font-sans: "Spline Sans", sans-serif;
+
+  /* --- COULEURS SEMANTIQUES --- */
+  /* Ces variables changent de valeur selon le mode (voir plus bas) */
+  
+  /* Primaire (Le Jaune Neon) */
+  --color-primary: #f9f506;
+  --color-primary-hover: #e0dc05;
+  --color-primary-content: #18181b;
+
+  /* Arrière-plans */
+  --color-bg-app: var(--bg-app);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-hover: var(--bg-surface-hover);
+  --color-bg-element: var(--bg-element);
+
+  /* Bordures */
+  --color-border-main: var(--border-main);
+  --color-border-subtle: var(--border-subtle);
+
+  /* Texte */
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-text-inverse: var(--text-inverse);
+
+  /* Status (Pastels) */
+  --color-tag-blue-bg: var(--tag-blue-bg);
+  --color-tag-blue-text: var(--tag-blue-text);
+  --color-tag-yellow-bg: var(--tag-yellow-bg);
+  --color-tag-yellow-text: var(--tag-yellow-text);
+  --color-tag-red-bg: var(--tag-red-bg);
+  --color-tag-red-text: var(--tag-red-text);
+  --color-tag-purple-bg: var(--tag-purple-bg);
+  --color-tag-purple-text: var(--tag-purple-text);
+
+  /* Ombres */
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-glow: 0 0 20px rgba(249, 245, 6, 0.15);
+}
+
+/* --- VALEURS DES VARIABLES --- */
+:root {
+  /* MODE CLAIR (Par défaut) */
+  --bg-app: #f8fafc;        /* Slate 50 */
+  --bg-surface: #ffffff;    /* White */
+  --bg-surface-hover: #f1f5f9;
+  --bg-element: #f1f5f9;    /* Slate 100 */
+  
+  --border-main: #e2e8f0;   /* Slate 200 */
+  --border-subtle: #f1f5f9;
+  
+  --text-main: #0f172a;     /* Slate 900 */
+  --text-muted: #64748b;    /* Slate 500 */
+  --text-inverse: #ffffff;
+
+  /* Tags Clair */
+  --tag-blue-bg: #e0f2fe; --tag-blue-text: #0369a1;
+  --tag-yellow-bg: #fef9c3; --tag-yellow-text: #854d0e;
+  --tag-red-bg: #fee2e2; --tag-red-text: #991b1b;
+  --tag-purple-bg: #f3e8ff; --tag-purple-text: #6b21a8;
+}
+
+:root.dark {
+  /* MODE SOMBRE */
+  --bg-app: #020617;        /* Slate 950 (Plus profond) */
+  --bg-surface: #0f172a;    /* Slate 900 */
+  --bg-surface-hover: #1e293b;
+  --bg-element: #1e293b;    /* Slate 800 */
+  
+  --border-main: #1e293b;   /* Slate 800 */
+  --border-subtle: #334155;
+  
+  --text-main: #f8fafc;     /* Slate 50 */
+  --text-muted: #94a3b8;    /* Slate 400 */
+  --text-inverse: #0f172a;
+
+  /* Tags Sombre (Plus transparents) */
+  --tag-blue-bg: rgba(56, 189, 248, 0.15); --tag-blue-text: #7dd3fc;
+  --tag-yellow-bg: rgba(253, 224, 71, 0.15); --tag-yellow-text: #fde047;
+  --tag-red-bg: rgba(248, 113, 113, 0.15); --tag-red-text: #fca5a5;
+  --tag-purple-bg: rgba(192, 132, 252, 0.15); --tag-purple-text: #d8b4fe;
+}
+
+/* Base Reset */
+html, body {
+  background-color: var(--color-bg-app);
+  color: var(--color-text-main);
+  font-family: var(--font-display);
+  height: 100%;
+  overflow: hidden;
+  /* Transition douce lors du changement de thème */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Material Icons Fix */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  user-select: none; 
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border-main); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }

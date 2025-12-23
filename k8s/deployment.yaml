@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: klaro
+  namespace: apps
+  labels:
+    app: klaro
+spec:
+  replicas: 1 # Tu pourras augmenter ça plus tard
+  selector:
+    matchLabels:
+      app: klaro
+  template:
+    metadata:
+      labels:
+        app: klaro
+    spec:
+      securityContext:
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001 # <--- K3s fera un chown automatique du volume vers ce groupe
+      containers:
+        - name: klaro
+          # Le tag sera remplacé dynamiquement par la CI/CD
+          image: DOCKER_IMAGE_PLACEHOLDER 
+          ports:
+            - containerPort: 8080 # Le port exposé par ton main.go
+          env:
+            - name: PORT
+              value: "8080"
+            - name: DB_PATH
+              value: "/data/klaro.db"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: klaro-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: klaro-pvc
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path # Le stockage par défaut de K3s
+  resources:
+    requests:
+      storage: 1Gi

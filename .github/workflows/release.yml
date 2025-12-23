@@ -1,0 +1,83 @@
+name: Build & Release (Tag Only)
+
+on:
+  push:
+    tags:
+      - 'v*' # Se déclenche UNIQUEMENT si le push est un tag (ex: v1.0.1)
+
+env:
+  IMAGE_NAME: spadmdck/klaro
+
+jobs:
+  build-release-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Pour créer la Release GitHub
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. Récupération de la version depuis package.json
+      # C'est la source de vérité.
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(jq -r .version package.json)
+          # Vérification de sécurité : Le tag Git DOIT matcher le package.json
+          # Si tu as tagué v1.0.1 mais que le json dit 1.0.0, ça coupe.
+          if [[ "v$VERSION" != "${{ github.ref_name }}" ]]; then
+            echo "❌ Erreur : Le tag Git (${{ github.ref_name }}) ne correspond pas au package.json ($VERSION)"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      # 2. Docker Build & Push (Hub Propre)
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # On ne crée que 2 tags : la version précise et le latest
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_NAME }}:latest
+
+      # 3. Création de la Release GitHub
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Klaro v${{ steps.version.outputs.VERSION }}
+          generate_release_notes: true
+          prerelease: false
+
+  # JOB DEPLOIEMENT (Sur ton Cluster)
+  deploy-to-cluster:
+    needs: build-release-deploy
+    runs-on: [self-hosted, k8s-deploy]
+    if: success()
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Get Version
+        id: get_version
+        run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+
+      - name: Deploy to K3s
+        env:
+          TAG: ${{ steps.get_version.outputs.VERSION }}
+        run: |
+          echo "🚀 Déploiement de la version $TAG..."
+          
+          # Mise à jour de l'image dans le déploiement K8s
+          kubectl set image deployment/klaro klaro=${{ env.IMAGE_NAME }}:$TAG -n apps
+          
+          # Vérification
+          kubectl rollout status deployment/klaro -n apps
+          echo "✅ Production mise à jour en v$TAG"

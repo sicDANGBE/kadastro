@@ -1,0 +1,87 @@
+📦 Feature A : feat/front-store-epics (La Plomberie)
+Objectif : Connecter le Frontend à la nouvelle API Backend sans toucher à l'UI.
+
+Contenu :
+
+Mise à jour des types TypeScript dans stores/klaro.ts (Ajout interfaces Epic, EpicTask).
+
+Ajout des actions Pinia : fetchEpics, createEpic, addEpicTask, toggleEpicTask.
+
+Adaptation des getters pour préparer les données du calendrier.
+
+##############################################################
+##############################################################
+##############################################################
+Prompt:
+"Mets à jour le fichier frontend/src/stores/klaro.ts. Je veux intégrer la nouvelle logique Backend Epic (Projets sur la durée) tout en gardant Item (Events ponctuels).
+
+Ajoute les interfaces Epic et EpicTask correspondant aux structs Go.
+
+Ajoute un state epics: ref<Epic[]>([]).
+
+Ajoute les actions fetchEpics, createEpic (POST /api/epics), createEpicTask (POST /api/epics/{id}/tasks) et toggleEpicTask.
+
+Crée un getter calendarRanges qui transforme les Epics en objets utilisables pour l'affichage (avec start, end, couleur, % de progression)."
+##############################################################
+##############################################################
+##############################################################
+
+
+
+🎨 Feature B : feat/ui-creation-flow (L'Entrée de données)
+Objectif : Permettre à l'utilisateur de choisir entre créer un "Event" (Item simple) ou une "Épopée" (Projet long).
+
+Contenu :
+
+Modification de CreateModal.vue.
+
+Ajout d'un système d'onglets : "Tâche Rapide" (Item) vs "Épopée" (Epic).
+
+Formulaire Épopée : Titre, Description, Date Début et Date Fin obligatoires, Priorité.
+
+Pas de sous-tâches à la création de l'épopée (on crée le contenant d'abord).
+
+Prompt
+##############################################################
+##############################################################
+##############################################################
+"Modifie frontend/src/components/CreateModal.vue. Je veux séparer la création en deux modes via des onglets en haut de la modale :
+
+Mode 'Event' (L'existant) : Pour les items simples, ponctuels (Date unique ou Backlog).
+
+Mode 'Épopée' (Nouveau) : Pour les projets longs. Champs Épopée : Titre, Description, Priorité (Low/Med/High), Date de Début et Date de Fin (Obligatoires). Le bouton 'Créer' doit appeler la bonne action du store (createItem ou createEpic) selon l'onglet actif."
+
+##############################################################
+##############################################################
+##############################################################
+
+
+
+📅 Feature C : feat/ui-calendar-epics (La Visualisation)
+Objectif : Afficher les Épopées comme des barres continues sur le calendrier (timeline) et gérer leurs tâches.
+
+Contenu :
+
+Vue Mois : Afficher des barres colorées qui traversent les cases des jours (style Gantt simplifié).
+
+Vue Semaine : Afficher une section "Projets en cours" en haut de la grille horaire (comme les "All day events" de Google Calendar).
+
+Détail : Créer EpicDetailModal.vue pour voir l'avancement, ajouter des tâches à l'épopée et les cocher.
+
+Prompt
+##############################################################
+##############################################################
+##############################################################
+"Mets à jour frontend/src/App.vue pour afficher les Épopées. Dans la Vue Mois (Grille) :
+
+En plus des items ponctuels (points/textes), affiche les Épopées sous forme de barres horizontales colorées.
+
+Ces barres doivent visuellement commencer à start_date et finir à end_date.
+
+Si une épopée traverse plusieurs semaines, gère l'affichage pour qu'elle apparaisse sur les lignes concernées.
+
+Au clic sur une barre d'épopée, ouvre une nouvelle modale EpicDetailModal (à créer) qui permet d'ajouter/cocher des tâches spécifiques à cette épopée."
+
+##############################################################
+##############################################################
+##############################################################

@@ -1,0 +1,27 @@
+# Binaires et Builds
+dist/
+bin/
+main
+backend/main
+backend/tmp/
+
+# Dépendances
+node_modules/
+.pnpm-store/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+
+# Base de données (IMPORTANT : ne jamais commit la DB de prod/dev)
+*.db
+*.db-journal
+*.sqlite
+
+# Environnement
+.env
+
+# sanitaize
+san_*
+
