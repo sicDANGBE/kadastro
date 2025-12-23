@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. Tests Frontend
+      # 1. Tests Frontend (Vue 3 + TS)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -22,18 +22,21 @@ jobs:
           cd frontend
           corepack enable
           pnpm install
-          pnpm build # Vérifie que le front compile sans erreur TS
+          pnpm build
 
-      # 2. Tests Backend
+      # 2. Tests Backend (Go)
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23' # Ou ta version
+          go-version: '1.23'
       - name: Test Backend
         run: |
           cd backend
           go test ./... 
 
-      # 3. Dry Run Docker (On build mais on ne push pas)
-      - name: Verify Docker Build
-        run: docker build .
+      # 3. Dry Run Docker (Vérification des deux Dockerfiles)
+      - name: Verify Docker UI Build
+        run: docker build -t kadastro-ui-test ./frontend
+      
+      - name: Verify Docker API Build
+        run: docker build -t kadastro-api-test ./backend

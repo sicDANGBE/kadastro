@@ -1,52 +1,48 @@
+# 1. DEPLOYMENT BACKEND
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: klaro
-  namespace: apps
-  labels:
-    app: klaro
+  name: kadastro-api
 spec:
-  replicas: 1 # Tu pourras augmenter ça plus tard
+  replicas: 2
   selector:
     matchLabels:
-      app: klaro
+      app: kadastro-api
   template:
     metadata:
       labels:
-        app: klaro
+        app: kadastro-api
     spec:
-      securityContext:
-        runAsUser: 10001
-        runAsGroup: 10001
-        fsGroup: 10001 # <--- K3s fera un chown automatique du volume vers ce groupe
       containers:
-        - name: klaro
-          # Le tag sera remplacé dynamiquement par la CI/CD
-          image: DOCKER_IMAGE_PLACEHOLDER 
-          ports:
-            - containerPort: 8080 # Le port exposé par ton main.go
-          env:
-            - name: PORT
-              value: "8080"
-            - name: DB_PATH
-              value: "/data/klaro.db"
-          volumeMounts:
-            - name: data
-              mountPath: /data
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: klaro-pvc
+      - name: api
+        image: registry.ton-domaine.fr/kadastro-api:latest
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
+# 2. DEPLOYMENT FRONTEND
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: klaro-pvc
-  namespace: apps
+  name: kadastro-ui
 spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: local-path # Le stockage par défaut de K3s
-  resources:
-    requests:
-      storage: 1Gi
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kadastro-ui
+  template:
+    metadata:
+      labels:
+        app: kadastro-ui
+    spec:
+      containers:
+      - name: ui
+        image: registry.ton-domaine.fr/kadastro-ui:latest
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "64Mi"

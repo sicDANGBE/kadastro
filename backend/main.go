@@ -8,14 +8,8 @@ import (
 	"github.com/sicDANGBE/kadastro/handlers"
 )
 
-func main() {
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/api/cadastre", handlers.GetParcelles)
-	mux.HandleFunc("/api/dvf", handlers.GetDVF)
-
-	// Middleware CORS pour le dev local
-	wrappedMux := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -23,11 +17,17 @@ func main() {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		mux.ServeHTTP(w, r)
+		next.ServeHTTP(w, r)
 	})
+}
 
-	fmt.Println("🚀 Serveur Kadastro prêt sur http://localhost:8080")
-	if err := http.ListenAndServe(":8080", wrappedMux); err != nil {
-		log.Fatal(err)
-	}
+func main() {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/api/cadastre", handlers.GetParcelles)
+	mux.HandleFunc("/api/dvf", handlers.GetDVF)
+	mux.HandleFunc("/api/dvf/commune", handlers.GetDVFByCommune)
+
+	fmt.Println("🚀 Kadastro API ready on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", corsMiddleware(mux)))
 }
